@@ -573,7 +573,7 @@ export default function LandingPage() {
                   <span>{t(translations.hero.callNow, lang)}</span>
                 </a>
                 <a 
-                  href="https://maps.google.com/?q=AVM+Plastics+Salem+Main+Road+Krishnagiri"
+                  href="https://maps.app.goo.gl/4rJHEPGafxX3FmM56"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`h-12 px-6 rounded-full bg-white/10 hover:bg-white/20 text-[#F8F9FB] border border-white/20 hover:border-[#D4AF37]/50 font-bold text-sm backdrop-blur-sm hover:scale-[1.04] transition-all duration-300 flex items-center justify-center gap-1.5 ${lang === 'ta' ? 'font-tamil' : ''}`}
@@ -1270,7 +1270,7 @@ export default function LandingPage() {
               {t(translations.cta.whatsappInquiry, lang)}
             </a>
             <a 
-              href="https://maps.google.com/?q=AVM+Plastics+Salem+Main+Road+Krishnagiri"
+              href="https://maps.app.goo.gl/4rJHEPGafxX3FmM56"
               target="_blank"
               rel="noopener noreferrer"
               className={`w-full sm:w-auto h-14 px-8 rounded-full bg-white/10 hover:bg-white/20 hover:scale-[1.03] active:scale-[0.98] text-white border border-white/20 hover:border-[#D4AF37]/50 font-bold text-sm backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${lang === 'ta' ? 'font-tamil' : ''}`}
@@ -1400,7 +1400,7 @@ export default function LandingPage() {
                   <p>{t(translations.contact.mapSubtitle, lang)}</p>
                 </div>
                 <a 
-                  href="https://maps.google.com/?q=AVM+Plastics+Salem+Main+Road+Krishnagiri"
+                  href="https://maps.app.goo.gl/4rJHEPGafxX3FmM56"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#B5932C] text-[#F8F9FB] font-bold text-xs shadow-md transition-colors ${lang === 'ta' ? 'font-tamil' : ''}`}
