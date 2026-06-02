@@ -436,7 +436,7 @@ export const translations = {
       en: "Contact Mr. Dhamodharan directly for current price sheets, wholesale distribution terms, and customized agricultural rope requirements.",
       ta: "தற்போதைய விலைப்பட்டியல், மொத்த விற்பனை விநியோக விதிமுறைகள் மற்றும் தனிப்பயன் விவசாய கயிறு தேவைகளுக்கு திரு. தாமோதரனை நேரடியாக தொடர்பு கொள்ளுங்கள்."
     },
-    callNow: { en: "Call Now: +91 94434 15251", ta: "இப்போது அழைக்கவும்: +91 94434 15251" },
+    callNow: { en: "Call Now: +91 63794 55162", ta: "இப்போது அழைக்கவும்: +91 63794 55162" },
     whatsappInquiry: { en: "WhatsApp Inquiry", ta: "WhatsApp விசாரணை" },
     getDirections: { en: "Get Directions", ta: "வழிகாட்டியை பெறுங்கள்" }
   },
@@ -467,7 +467,7 @@ export const translations = {
     directContact: { en: "Direct Contact", ta: "நேரடி தொடர்பு" },
     contactPerson: { en: "Mr. Dhamodharan", ta: "திரு. தாமோதரன்" },
     yearsInBusiness: { en: "36+ Years in Business", ta: "36+ ஆண்டுகள் வணிகத்தில்" },
-    callBtn: { en: "Call 94434 15251", ta: "94434 15251 அழைக்கவும்" },
+    callBtn: { en: "Call 63794 55162", ta: "63794 55162 அழைக்கவும்" },
     whatsappBtn: { en: "WhatsApp Query", ta: "WhatsApp விசாரணை" },
     mapTitle: { en: "AVM PLASTICS", ta: "ஏவிஎம் பிளாஸ்டிக்ஸ்" },
     mapSubtitle: { en: "Salem Main Road, Krishnagiri Courts Area", ta: "சேலம் மெயின் ரோடு, கிருஷ்ணகிரி கோர்ட்ஸ் பகுதி" },
@@ -502,7 +502,7 @@ export const translations = {
 
   // ─── MOBILE MENU ───
   mobile: {
-    callNow: { en: "Call Now: +91 94434 15251", ta: "இப்போது அழைக்கவும்: +91 94434 15251" },
+    callNow: { en: "Call Now: +91 63794 55162", ta: "இப்போது அழைக்கவும்: +91 63794 55162" },
     ownerPortal: { en: "Owner Portal Access", ta: "உரிமையாளர் போர்டல் அணுகல்" }
   },
 

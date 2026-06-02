@@ -339,12 +339,12 @@ export default function LandingPage() {
             </div>
 
             <a 
-              href="tel:+919443415251"
+              href="tel:+916379455162"
               className="inline-flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-full bg-[#0A4D8C] text-[#F8F9FB] hover:bg-[#0A4D8C]/90 hover:scale-[1.03] active:scale-[0.98] font-bold text-[12px] lg:text-[14px] transition-all duration-300 shadow-[0_4px_14px_rgba(10,77,140,0.15)] hover:shadow-[0_6px_20px_rgba(212,175,55,0.25)] border border-[#D4AF37]/35 cursor-pointer whitespace-nowrap shrink-0"
               style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
             >
               <Phone size={14} className="text-[#D4AF37] animate-pulse" />
-              <span>+91 94434 15251</span>
+              <span>+91 63794 55162</span>
             </a>
             <Link 
               href="/owner-login" 
@@ -381,7 +381,7 @@ export default function LandingPage() {
               </button>
             </div>
             <a 
-              href="tel:+919443415251" 
+              href="tel:+916379455162" 
               className="p-2.5 rounded-full bg-[#0A4D8C] text-white border border-[#D4AF37]/25"
             >
               <Phone size={16} />
@@ -418,7 +418,7 @@ export default function LandingPage() {
               <div className="h-[1px] bg-[#0A4D8C]/10 my-3" />
               <div className="flex flex-col gap-3">
                 <a 
-                  href="tel:+919443415251" 
+                  href="tel:+916379455162" 
                   className={`flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#0A4D8C] text-[#F8F9FB] font-bold text-sm shadow-md ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <Phone size={14} className="text-[#D4AF37]" />
@@ -566,7 +566,7 @@ export default function LandingPage() {
                   <ChevronRight size={16} />
                 </button>
                 <a 
-                  href="tel:+919443415251"
+                  href="tel:+916379455162"
                   className={`h-12 px-6 rounded-full bg-white hover:bg-slate-100 text-[#0A4D8C] font-bold text-sm shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:scale-[1.04] transition-all duration-300 flex items-center justify-center gap-1.5 border border-slate-200 ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <Phone size={14} className="text-[#D4AF37]" />
@@ -1254,14 +1254,14 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
             <a 
-              href="tel:+919443415251"
+              href="tel:+916379455162"
               className={`w-full sm:w-auto h-14 px-8 rounded-full bg-[#D4AF37] hover:bg-[#B5932C] hover:scale-[1.03] active:scale-[0.98] text-[#0A4D8C] font-bold text-sm shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer border border-[#0A4D8C]/10 ${lang === 'ta' ? 'font-tamil' : ''}`}
             >
               <Phone size={16} />
               {t(translations.cta.callNow, lang)}
             </a>
             <a 
-              href="https://wa.me/919443415251?text=Hi AVM Plastics, I would like to inquire about your products."
+              href="https://wa.me/916379455162?text=Hi AVM Plastics, I would like to inquire about your products."
               target="_blank"
               rel="noopener noreferrer"
               className={`w-full sm:w-auto h-14 px-8 rounded-full bg-[#10B981] hover:bg-[#10B981]/90 hover:scale-[1.03] active:scale-[0.98] text-white font-bold text-sm shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${lang === 'ta' ? 'font-tamil' : ''}`}
@@ -1350,7 +1350,7 @@ export default function LandingPage() {
                       <Phone className="text-[#D4AF37] shrink-0 mt-0.5" size={18} />
                       <div className={`text-xs font-medium ${lang === 'ta' ? 'font-tamil' : ''}`}>
                         <h4 className="font-bold text-[#0A4D8C] mb-1 font-heading">{t(translations.contact.directContact, lang)}</h4>
-                        <p className="text-slate-600 font-bold">94434 15251</p>
+                        <p className="text-slate-600 font-bold">63794 55162</p>
                         <p className="text-slate-500">{t(translations.contact.contactPerson, lang)}</p>
                         <span className="inline-block mt-1 px-2 py-0.5 bg-[#D4AF37]/15 text-[#D4AF37] text-[9px] font-bold rounded">
                           {t(translations.contact.yearsInBusiness, lang)}
@@ -1364,14 +1364,14 @@ export default function LandingPage() {
               {/* Action Buttons */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
                 <a 
-                  href="tel:+919443415251"
+                  href="tel:+916379455162"
                   className={`inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#0A4D8C] hover:bg-[#0A4D8C]/90 text-white font-bold text-sm shadow-md transition-colors ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <Phone size={14} className="text-[#D4AF37]" />
                   {t(translations.contact.callBtn, lang)}
                 </a>
                 <a 
-                  href="https://wa.me/919443415251?text=Hi AVM Plastics, I would like to inquire about your products."
+                  href="https://wa.me/916379455162?text=Hi AVM Plastics, I would like to inquire about your products."
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#10B981] hover:bg-[#10B981]/90 text-white font-bold text-sm shadow-md transition-colors ${lang === 'ta' ? 'font-tamil' : ''}`}
@@ -1521,7 +1521,7 @@ export default function LandingPage() {
                   {t(translations.modal.closeWindow, lang)}
                 </button>
                 <a 
-                  href={`https://wa.me/919443415251?text=${encodeURIComponent(activeCategory.waMessage)}`}
+                  href={`https://wa.me/916379455162?text=${encodeURIComponent(activeCategory.waMessage)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`py-3 rounded-xl bg-[#10B981] hover:bg-[#10B981]/90 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-1.5 ${lang === 'ta' ? 'font-tamil' : ''}`}
