@@ -366,3 +366,74 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .pause-on-hover:hover .animate-marquee-reverse {
   animation-play-state: paused;
 }
+
+/* ─── Tamil Typography & Language Switcher ─── */
+
+/* Tamil mode: global font adjustments */
+.lang-ta .font-tamil,
+.lang-ta h1,
+.lang-ta h2,
+.lang-ta h3,
+.lang-ta h4,
+.lang-ta h5,
+.lang-ta h6 {
+  font-family: var(--font-tamil), 'Noto Sans Tamil', 'Mukta Malar', 'Hind Madurai', sans-serif;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+.lang-ta p,
+.lang-ta span,
+.lang-ta button,
+.lang-ta a,
+.lang-ta label,
+.lang-ta li {
+  font-family: var(--font-tamil), 'Noto Sans Tamil', 'Mukta Malar', 'Hind Madurai', sans-serif;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+/* Ensure Tamil text never overflows */
+.lang-ta * {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Tamil heading line height adjustments */
+.lang-ta .font-heading {
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+/* Tamil text in small badges needs adjusted sizing */
+.lang-ta .tracking-widest {
+  letter-spacing: 0.05em;
+}
+
+.lang-ta .tracking-wider {
+  letter-spacing: 0.03em;
+}
+
+/* Language switch smooth fade transition */
+.lang-transition-fade {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Tamil responsive text size adjustments */
+@media (max-width: 640px) {
+  .lang-ta h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  .lang-ta h2 {
+    font-size: 1.5rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .lang-ta p,
+  .lang-ta span {
+    line-height: 1.8;
+  }
+}

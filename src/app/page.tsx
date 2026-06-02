@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion as motionClient, AnimatePresence } from 'framer-motion';
 import { 
   Phone, 
@@ -23,10 +23,12 @@ import {
   ChevronLeft,
   Maximize2,
   Play,
-  Pause
+  Pause,
+  Globe
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { translations, t, type Language } from './translations';
 
 // Static Data
 const CATEGORIES = [
@@ -183,6 +185,10 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // Language State
+  const [lang, setLang] = useState<Language>('en');
+  const [langTransitioning, setLangTransitioning] = useState(false);
+
   // Gallery Category Filter State
   const [selectedGalleryCategory, setSelectedGalleryCategory] = useState<'all' | 'store' | 'product' | 'warehouse'>('all');
 
@@ -193,6 +199,32 @@ export default function LandingPage() {
   // Dynamic gallery filter for hero slides
   const heroImages = GALLERY_IMAGES.filter(img => img.featured).map(img => img.src);
   const slidesToUse = heroImages.length > 0 ? heroImages : GALLERY_IMAGES.map(img => img.src);
+
+  // Load saved language from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('avm-lang');
+    if (saved === 'ta' || saved === 'en') {
+      setLang(saved);
+    }
+  }, []);
+
+  // Update html lang attribute when language changes
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  // Language switch handler with smooth transition
+  const switchLanguage = useCallback((newLang: Language) => {
+    if (newLang === lang) return;
+    setLangTransitioning(true);
+    setTimeout(() => {
+      setLang(newLang);
+      localStorage.setItem('avm-lang', newLang);
+      setTimeout(() => {
+        setLangTransitioning(false);
+      }, 50);
+    }, 200);
+  }, [lang]);
 
   // Automatic transition every 5 seconds
   useEffect(() => {
@@ -227,8 +259,20 @@ export default function LandingPage() {
     }
   };
 
+  // Navigation items with translations
+  const navItems = [
+    { id: 'home', label: translations.nav.home },
+    { id: 'about', label: translations.nav.about },
+    { id: 'products', label: translations.nav.products },
+    { id: 'leadership', label: translations.nav.leadership },
+    { id: 'gallery', label: translations.nav.gallery },
+    { id: 'contact', label: translations.nav.contact }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#F8F9FB] text-[#1E293B] font-sans antialiased overflow-x-hidden">
+    <div 
+      className={`min-h-screen bg-[#F8F9FB] text-[#1E293B] font-sans antialiased overflow-x-hidden transition-opacity duration-200 ${langTransitioning ? 'opacity-0' : 'opacity-100'} ${lang === 'ta' ? 'lang-ta' : ''}`}
+    >
       
       {/* HEADER SECTION (Sticky Navbar, Height: 85px) */}
       <header 
@@ -241,30 +285,56 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between">
           {/* Logo & Legacy (Left Side) */}
           <div className="flex flex-col cursor-pointer group" onClick={() => scrollToSection('home')}>
-            <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#0A4D8C] font-heading flex items-center gap-1.5 transition-colors duration-300">
-              AVM PLASTICS
+            <span className={`text-xl sm:text-2xl font-extrabold tracking-tight text-[#0A4D8C] font-heading flex items-center gap-1.5 transition-colors duration-300 ${lang === 'ta' ? 'font-tamil' : ''}`}>
+              {t(translations.companyName, lang)}
             </span>
-            <span className="text-[11px] text-[#D4AF37] font-bold tracking-widest uppercase transition-all duration-300 group-hover:tracking-wider">
-              Trusted Since 1986
+            <span className={`text-[11px] text-[#D4AF37] font-bold tracking-widest uppercase transition-all duration-300 group-hover:tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal group-hover:tracking-normal' : ''}`}>
+              {t(translations.tagline, lang)}
             </span>
           </div>
 
           {/* Navigation Links (Center) */}
           <nav className="hidden md:flex items-center gap-7 text-[15px] font-bold text-[#1E293B]">
-            {['Home', 'About', 'Products', 'Leadership', 'Gallery', 'Contact'].map((item) => (
+            {navItems.map((item) => (
               <button 
-                key={item}
-                onClick={() => scrollToSection(item.toLowerCase())} 
-                className="hover:text-[#0A4D8C] relative py-1 transition-colors duration-300 cursor-pointer group"
+                key={item.id}
+                onClick={() => scrollToSection(item.id)} 
+                className={`hover:text-[#0A4D8C] relative py-1 transition-colors duration-300 cursor-pointer group ${lang === 'ta' ? 'font-tamil' : ''}`}
               >
-                {item}
+                {t(item.label, lang)}
                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#D4AF37] transition-all duration-300 group-hover:w-full" />
               </button>
             ))}
           </nav>
 
-          {/* Call Now Button & Owner Icon (Right Side) */}
+          {/* Language Switcher + Call Now Button & Owner Icon (Right Side) */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Language Switcher */}
+            <div className="flex items-center bg-[#0A4D8C]/5 border border-[#0A4D8C]/10 rounded-full p-[3px] relative">
+              <button
+                onClick={() => switchLanguage('en')}
+                className={`relative z-10 px-3.5 py-1.5 rounded-full text-[12px] font-bold transition-all duration-300 cursor-pointer flex items-center gap-1.5 ${
+                  lang === 'en'
+                    ? 'bg-[#0A4D8C] text-white shadow-md'
+                    : 'text-[#1E293B] hover:text-[#0A4D8C]'
+                }`}
+              >
+                <span className="text-[14px]">🇬🇧</span>
+                <span>EN</span>
+              </button>
+              <button
+                onClick={() => switchLanguage('ta')}
+                className={`relative z-10 px-3.5 py-1.5 rounded-full text-[12px] font-bold transition-all duration-300 cursor-pointer flex items-center gap-1.5 ${
+                  lang === 'ta'
+                    ? 'bg-[#0A4D8C] text-white shadow-md'
+                    : 'text-[#1E293B] hover:text-[#0A4D8C]'
+                }`}
+              >
+                <span className="text-[14px]">🇮🇳</span>
+                <span className="font-tamil">தமிழ்</span>
+              </button>
+            </div>
+
             <a 
               href="tel:+919443415251"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0A4D8C] text-[#F8F9FB] hover:bg-[#0A4D8C]/90 hover:scale-[1.03] active:scale-[0.98] font-bold text-[14px] transition-all duration-300 shadow-[0_4px_14px_rgba(10,77,140,0.15)] hover:shadow-[0_6px_20px_rgba(212,175,55,0.25)] border border-[#D4AF37]/35 cursor-pointer"
@@ -275,14 +345,37 @@ export default function LandingPage() {
             <Link 
               href="/owner-login" 
               className="p-2.5 rounded-full bg-[#0A4D8C]/5 hover:bg-[#0A4D8C]/10 text-[#0A4D8C] border border-[#0A4D8C]/10 hover:border-[#D4AF37]/30 transition-all duration-300"
-              title="Owner Portal Login"
+              title={t(translations.footer.ownerPortal, lang)}
             >
               <Lock size={14} />
             </Link>
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="flex md:hidden items-center gap-3">
+          <div className="flex md:hidden items-center gap-2">
+            {/* Mobile Language Switcher */}
+            <div className="flex items-center bg-[#0A4D8C]/5 border border-[#0A4D8C]/10 rounded-full p-[2px]">
+              <button
+                onClick={() => switchLanguage('en')}
+                className={`px-2 py-1 rounded-full text-[10px] font-bold transition-all duration-300 cursor-pointer ${
+                  lang === 'en'
+                    ? 'bg-[#0A4D8C] text-white shadow-sm'
+                    : 'text-[#1E293B]'
+                }`}
+              >
+                🇬🇧
+              </button>
+              <button
+                onClick={() => switchLanguage('ta')}
+                className={`px-2 py-1 rounded-full text-[10px] font-bold transition-all duration-300 cursor-pointer ${
+                  lang === 'ta'
+                    ? 'bg-[#0A4D8C] text-white shadow-sm'
+                    : 'text-[#1E293B]'
+                }`}
+              >
+                🇮🇳
+              </button>
+            </div>
             <a 
               href="tel:+919443415251" 
               className="p-2.5 rounded-full bg-[#0A4D8C] text-white border border-[#D4AF37]/25"
@@ -307,14 +400,14 @@ export default function LandingPage() {
               exit={{ height: 0, opacity: 0 }}
               className="md:hidden absolute top-[85px] inset-x-0 bg-[#F8F9FB] border-b border-[#0A4D8C]/15 shadow-lg overflow-hidden px-6 py-6 space-y-4"
             >
-              <div className="flex flex-col gap-4 text-[15px] font-bold text-[#1E293B]">
-                {['Home', 'About', 'Products', 'Leadership', 'Gallery', 'Contact'].map((item) => (
+              <div className={`flex flex-col gap-4 text-[15px] font-bold text-[#1E293B] ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                {navItems.map((item) => (
                   <button 
-                    key={item}
-                    onClick={() => scrollToSection(item.toLowerCase())} 
+                    key={item.id}
+                    onClick={() => scrollToSection(item.id)} 
                     className="text-left py-1.5 hover:text-[#0A4D8C] transition-colors cursor-pointer"
                   >
-                    {item}
+                    {t(item.label, lang)}
                   </button>
                 ))}
               </div>
@@ -322,18 +415,18 @@ export default function LandingPage() {
               <div className="flex flex-col gap-3">
                 <a 
                   href="tel:+919443415251" 
-                  className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#0A4D8C] text-[#F8F9FB] font-bold text-sm shadow-md"
+                  className={`flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#0A4D8C] text-[#F8F9FB] font-bold text-sm shadow-md ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <Phone size={14} className="text-[#D4AF37]" />
-                  Call Now: +91 94434 15251
+                  {t(translations.mobile.callNow, lang)}
                 </a>
                 <Link 
                   href="/owner-login" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#0A4D8C]/5 border border-[#0A4D8C]/10 text-xs font-bold text-[#0A4D8C]"
+                  className={`flex items-center justify-center gap-2 py-3 rounded-xl bg-[#0A4D8C]/5 border border-[#0A4D8C]/10 text-xs font-bold text-[#0A4D8C] ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <Lock size={12} />
-                  Owner Portal Access
+                  {t(translations.mobile.ownerPortal, lang)}
                 </Link>
               </div>
             </motionClient.div>
@@ -428,10 +521,10 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 border border-[#D4AF37]/50 text-[#D4AF37] text-xs font-black tracking-widest uppercase backdrop-blur-md"
+                className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 border border-[#D4AF37]/50 text-[#D4AF37] text-xs font-black tracking-widest uppercase backdrop-blur-md ${lang === 'ta' ? 'font-tamil tracking-wider' : ''}`}
               >
                 <Sparkles size={12} className="animate-spin-slow" />
-                TRUSTED SINCE 1986
+                {t(translations.hero.badge, lang)}
               </motionClient.div>
 
               {/* Main Heading */}
@@ -439,9 +532,9 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.1 }}
-                className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight text-[#F8F9FB] font-heading leading-[1.1] drop-shadow-md"
+                className={`text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight text-[#F8F9FB] font-heading leading-[1.1] drop-shadow-md ${lang === 'ta' ? 'font-tamil text-3xl sm:text-4xl lg:text-[46px] leading-[1.25]' : ''}`}
               >
-                Serving Homes, Farmers & Businesses For <span className="text-[#D4AF37]">Nearly Four Decades</span>
+                {t(translations.hero.headingStart, lang)}<span className="text-[#D4AF37]">{t(translations.hero.headingHighlight, lang)}</span>{t(translations.hero.headingSuffix, lang)}
               </motionClient.h1>
 
               {/* Subheading */}
@@ -449,9 +542,9 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.2 }}
-                className="text-base sm:text-lg text-slate-100/90 leading-relaxed font-medium max-w-2xl drop-shadow"
+                className={`text-base sm:text-lg text-slate-100/90 leading-relaxed font-medium max-w-2xl drop-shadow ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}
               >
-                Krishnagiri's trusted destination for premium ropes, agriculture utility products, plastic goods and wholesale distribution since 1986.
+                {t(translations.hero.subheading, lang)}
               </motionClient.p>
 
               {/* Action Buttons */}
@@ -463,26 +556,26 @@ export default function LandingPage() {
               >
                 <button 
                   onClick={() => scrollToSection('products')}
-                  className="h-12 px-6 rounded-full bg-[#0A4D8C] hover:bg-[#0A4D8C]/90 text-white font-bold text-sm shadow-[0_4px_14px_rgba(10,77,140,0.3)] hover:scale-[1.04] transition-all duration-300 flex items-center justify-center gap-1.5 border border-[#D4AF37]/35 cursor-pointer"
+                  className={`h-12 px-6 rounded-full bg-[#0A4D8C] hover:bg-[#0A4D8C]/90 text-white font-bold text-sm shadow-[0_4px_14px_rgba(10,77,140,0.3)] hover:scale-[1.04] transition-all duration-300 flex items-center justify-center gap-1.5 border border-[#D4AF37]/35 cursor-pointer ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
-                  <span>Explore Products</span>
+                  <span>{t(translations.hero.exploreProducts, lang)}</span>
                   <ChevronRight size={16} />
                 </button>
                 <a 
                   href="tel:+919443415251"
-                  className="h-12 px-6 rounded-full bg-white hover:bg-slate-100 text-[#0A4D8C] font-bold text-sm shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:scale-[1.04] transition-all duration-300 flex items-center justify-center gap-1.5 border border-slate-200"
+                  className={`h-12 px-6 rounded-full bg-white hover:bg-slate-100 text-[#0A4D8C] font-bold text-sm shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:scale-[1.04] transition-all duration-300 flex items-center justify-center gap-1.5 border border-slate-200 ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <Phone size={14} className="text-[#D4AF37]" />
-                  <span>Call Now</span>
+                  <span>{t(translations.hero.callNow, lang)}</span>
                 </a>
                 <a 
                   href="https://maps.google.com/?q=AVM+Plastics+Salem+Main+Road+Krishnagiri"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-12 px-6 rounded-full bg-white/10 hover:bg-white/20 text-[#F8F9FB] border border-white/20 hover:border-[#D4AF37]/50 font-bold text-sm backdrop-blur-sm hover:scale-[1.04] transition-all duration-300 flex items-center justify-center gap-1.5"
+                  className={`h-12 px-6 rounded-full bg-white/10 hover:bg-white/20 text-[#F8F9FB] border border-white/20 hover:border-[#D4AF37]/50 font-bold text-sm backdrop-blur-sm hover:scale-[1.04] transition-all duration-300 flex items-center justify-center gap-1.5 ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <MapPin size={14} className="text-[#D4AF37]" />
-                  <span>Get Directions</span>
+                  <span>{t(translations.hero.getDirections, lang)}</span>
                 </a>
               </motionClient.div>
             </div>
@@ -500,25 +593,20 @@ export default function LandingPage() {
                   <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#D4AF37]/15 blur-3xl pointer-events-none" />
                   <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/10 blur-3xl pointer-events-none" />
 
-                  <h3 className="text-xs font-black tracking-widest text-[#D4AF37] uppercase border-b border-white/20 pb-4 mb-6 flex items-center gap-2">
+                  <h3 className={`text-xs font-black tracking-widest text-[#D4AF37] uppercase border-b border-white/20 pb-4 mb-6 flex items-center gap-2 ${lang === 'ta' ? 'font-tamil tracking-wider text-[11px]' : ''}`}>
                     <Sparkles className="text-[#D4AF37] animate-pulse" size={14} />
-                    <span>AVM PLASTICS CREDENTIALS</span>
+                    <span>{t(translations.hero.credentialsTitle, lang)}</span>
                   </h3>
 
                   <div className="space-y-6">
-                    {[
-                      { value: "38+ Years", label: "Legacy Business", desc: "Serving quality since 1986" },
-                      { value: "10,000+", label: "Customers Served", desc: "Wholesale & retail support" },
-                      { value: "1,000+", label: "Products Available", desc: "Large in-stock utility goods" },
-                      { value: "Tamil Nadu", label: "Trusted Across", desc: "Deep agricultural roots" }
-                    ].map((stat, idx) => (
+                    {translations.credentials.map((stat, idx) => (
                       <div key={idx} className="flex items-center gap-4 group/item">
                         <div className="w-12 h-12 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center text-[#D4AF37] font-extrabold text-sm shrink-0 group-hover/item:bg-[#D4AF37] group-hover/item:text-[#0A4D8C] transition-all duration-300">
                           {idx === 0 ? "38+" : idx === 1 ? "10K+" : idx === 2 ? "1K+" : "TN"}
                         </div>
                         <div>
-                          <h4 className="text-base font-bold text-[#F8F9FB] leading-tight">{stat.value} {stat.label}</h4>
-                          <p className="text-xs text-slate-200/90">{stat.desc}</p>
+                          <h4 className={`text-base font-bold text-[#F8F9FB] leading-tight ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(stat.value, lang)} {t(stat.label, lang)}</h4>
+                          <p className={`text-xs text-slate-200/90 ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(stat.desc, lang)}</p>
                         </div>
                       </div>
                     ))}
@@ -559,12 +647,7 @@ export default function LandingPage() {
       {/* PREMIUM TRUST SECTION (Immediately Below Hero, 4 Trust Cards with Icons) */}
       <section className="relative z-20 -mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[
-            { title: "Established 1986", desc: "Nearly four decades of business integrity & trust.", icon: Award },
-            { title: "Agriculture Utility Supplier", desc: "High-grade ropes & utility tools for farmers.", icon: Package },
-            { title: "Wholesale Plastic Distributor", desc: "Serving retail markets across South India.", icon: Layers },
-            { title: "Trusted Local Business", desc: "5-star reputation in Krishnagiri and beyond.", icon: ShieldCheck }
-          ].map((item, idx) => (
+          {[Award, Package, Layers, ShieldCheck].map((IconComp, idx) => (
             <motionClient.div 
               key={idx} 
               initial={{ opacity: 0, y: 25 }}
@@ -574,13 +657,13 @@ export default function LandingPage() {
               className="p-6 rounded-[24px] bg-white border border-[#0A4D8C]/10 shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_15px_35px_rgba(10,77,140,0.1)] hover:border-[#D4AF37] hover:scale-[1.02] transition-all duration-300 flex flex-col items-center text-center group"
             >
               <div className="w-12 h-12 rounded-2xl bg-[#0A4D8C]/5 text-[#0A4D8C] group-hover:bg-[#0A4D8C] group-hover:text-white flex items-center justify-center transition-colors duration-300 mb-4 shadow-sm border border-[#0A4D8C]/5">
-                <item.icon size={22} />
+                <IconComp size={22} />
               </div>
-              <h3 className="text-base font-bold text-[#1E293B] group-hover:text-[#0A4D8C] transition-colors mb-1.5 font-heading">
-                {item.title}
+              <h3 className={`text-base font-bold text-[#1E293B] group-hover:text-[#0A4D8C] transition-colors mb-1.5 font-heading ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                {t(translations.trustCards[idx].title, lang)}
               </h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                {item.desc}
+              <p className={`text-xs text-slate-500 leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                {t(translations.trustCards[idx].desc, lang)}
               </p>
             </motionClient.div>
           ))}
@@ -594,16 +677,16 @@ export default function LandingPage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider">
+            <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
               <Award size={12} />
-              Our Heritage & Foundation
+              {t(translations.about.badge, lang)}
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading">
-              Four Decades of South Indian Business Excellence
+            <h2 className={`text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[36px] leading-[1.3]' : ''}`}>
+              {t(translations.about.heading, lang)}
             </h2>
             <div className="h-[3px] w-20 bg-[#D4AF37] mx-auto rounded-full" />
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">
-              Established in 1986, AVM Plastics has been a pillar of commercial excellence and retail reliability in Krishnagiri, Tamil Nadu.
+            <p className={`text-slate-500 text-sm sm:text-base leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+              {t(translations.about.subheading, lang)}
             </p>
           </div>
 
@@ -633,17 +716,17 @@ export default function LandingPage() {
               {/* Founder Details & Story */}
               <div className="flex-grow space-y-5 text-center lg:text-left">
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-[11px] font-black uppercase tracking-wider">
-                    Founder
+                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-[11px] font-black uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                    {t(translations.about.founderBadge, lang)}
                   </span>
-                  <span className="inline-flex items-center gap-1 px-3.5 py-1 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-[11px] font-bold tracking-wider">
-                    Former TNCSC Superintendent
+                  <span className={`inline-flex items-center gap-1 px-3.5 py-1 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-[11px] font-bold tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                    {t(translations.about.founderTitle, lang)}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-2xl sm:text-3.5xl font-extrabold text-[#0A4D8C] font-heading">Mr. K. Arumugam</h3>
-                  <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mt-1">
-                    Founder of AVM Plastics (1986)
+                  <h3 className={`text-2xl sm:text-3.5xl font-extrabold text-[#0A4D8C] font-heading ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.about.founderName, lang)}</h3>
+                  <p className={`text-xs text-slate-400 font-bold tracking-widest uppercase mt-1 ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                    {t(translations.about.founderSubtitle, lang)}
                   </p>
                 </div>
                 <div className="h-[2px] w-14 bg-[#D4AF37] mx-auto lg:mx-0 rounded-full" />
@@ -651,7 +734,7 @@ export default function LandingPage() {
                 {/* Thirukkural callout with custom design */}
                 <div className="p-5 rounded-2xl bg-slate-50 border-l-4 border-[#D4AF37] text-left space-y-2">
                   <p className="text-[#0A4D8C] font-bold text-sm sm:text-base font-tamil italic leading-relaxed">
-                    "ஒழுக்கம் விழுப்பம் தரலான்; ஒழுக்கம் உயிரினும் ஓம்பப்பட வேண்டும்."
+                    &quot;ஒழுக்கம் விழுப்பம் தரலான்; ஒழுக்கம் உயிரினும் ஓம்பப்பட வேண்டும்.&quot;
                   </p>
                   <p className="text-[#D4AF37] text-xs font-black tracking-wider">— திருக்குறள் 131</p>
                   <p className="text-slate-500 text-xs font-tamil font-semibold leading-relaxed pt-1">
@@ -659,12 +742,12 @@ export default function LandingPage() {
                   </p>
                 </div>
 
-                <p className="text-sm sm:text-base text-[#1E293B] leading-relaxed font-medium italic">
-                  "Since 1986, AVM Plastics has been built on trust, discipline, and integrity. Every customer relationship is founded on honesty, fair pricing, and unwavering commitment. The trust of our customers is our greatest achievement and the legacy we proudly continue."
+                <p className={`text-sm sm:text-base text-[#1E293B] leading-relaxed font-medium italic ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+                  {t(translations.about.founderQuote, lang)}
                 </p>
                 <div className="pt-2 text-right lg:text-left">
-                  <p className="text-sm font-bold text-[#0A4D8C]">— K. Arumugam</p>
-                  <p className="text-xs text-slate-400 font-semibold">Founder</p>
+                  <p className={`text-sm font-bold text-[#0A4D8C] ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.about.founderSignName, lang)}</p>
+                  <p className={`text-xs text-slate-400 font-semibold ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.about.founderSignTitle, lang)}</p>
                 </div>
               </div>
             </div>
@@ -679,16 +762,16 @@ export default function LandingPage() {
  
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider">
+            <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
               <Layers size={12} />
-              Active Leadership
+              {t(translations.leadership.badge, lang)}
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading">
-              Managing Director
+            <h2 className={`text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[36px] leading-[1.3]' : ''}`}>
+              {t(translations.leadership.heading, lang)}
             </h2>
             <div className="h-[3px] w-20 bg-[#0A4D8C] mx-auto rounded-full" />
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">
-              Driving technology and operations forward while maintaining our decades-long trust foundation.
+            <p className={`text-slate-500 text-sm sm:text-base leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+              {t(translations.leadership.subheading, lang)}
             </p>
           </div>
  
@@ -717,13 +800,13 @@ export default function LandingPage() {
  
           {/* MD Details & Operations */}
               <div className="flex-grow space-y-5 text-center lg:text-left">
-                <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-[11px] font-black uppercase tracking-wider">
-                  Managing Director
+                <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-[11px] font-black uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                  {t(translations.leadership.mdBadge, lang)}
                 </div>
                 <div>
-                  <h3 className="text-2xl sm:text-3.5xl font-extrabold text-[#0A4D8C] font-heading">Mr. Dhamodharan Arumugam</h3>
-                  <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mt-1">
-                    Operations & Customer Relations
+                  <h3 className={`text-2xl sm:text-3.5xl font-extrabold text-[#0A4D8C] font-heading ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.leadership.mdName, lang)}</h3>
+                  <p className={`text-xs text-slate-400 font-bold tracking-widest uppercase mt-1 ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                    {t(translations.leadership.mdSubtitle, lang)}
                   </p>
                 </div>
                 <div className="h-[2px] w-14 bg-[#0A4D8C] mx-auto lg:mx-0 rounded-full" />
@@ -731,19 +814,19 @@ export default function LandingPage() {
                 {/* Tamil Proverb callout with custom design */}
                 <div className="p-5 rounded-2xl bg-white border-l-4 border-[#0A4D8C] text-left space-y-1">
                   <p className="text-[#0A4D8C] font-bold text-sm sm:text-base font-tamil italic leading-relaxed">
-                    "பொறுமை கடலினும் பெரிது"
+                    &quot;பொறுமை கடலினும் பெரிது&quot;
                   </p>
-                  <p className="text-slate-500 text-xs font-semibold leading-relaxed">
-                    (Patience is greater than the ocean.)
+                  <p className={`text-slate-500 text-xs font-semibold leading-relaxed ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                    {t(translations.leadership.mdProverbTranslation, lang)}
                   </p>
                 </div>
 
-                <p className="text-sm sm:text-base text-[#1E293B] leading-relaxed font-medium italic">
-                  "Guided by our founder's values, we combine tradition with innovation to serve our customers better every day. Through continuous improvement, reliable service, and customer-focused growth, we remain committed to delivering quality, value, and trust across Tamil Nadu."
+                <p className={`text-sm sm:text-base text-[#1E293B] leading-relaxed font-medium italic ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+                  {t(translations.leadership.mdQuote, lang)}
                 </p>
                 <div className="pt-2 text-right lg:text-left">
-                  <p className="text-sm font-bold text-[#0A4D8C]">— Dhamodharan Arumugam</p>
-                  <p className="text-xs text-slate-400 font-semibold">Managing Director</p>
+                  <p className={`text-sm font-bold text-[#0A4D8C] ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.leadership.mdSignName, lang)}</p>
+                  <p className={`text-xs text-slate-400 font-semibold ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.leadership.mdSignTitle, lang)}</p>
                 </div>
               </div>
             </div>
@@ -758,16 +841,16 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-xs font-bold uppercase tracking-wider">
+            <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-xs font-bold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
               <Layers size={12} />
-              Administration &amp; Finance
+              {t(translations.director.badge, lang)}
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading">
-              Director – Administration &amp; Finance
+            <h2 className={`text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[36px] leading-[1.3]' : ''}`}>
+              {t(translations.director.heading, lang)}
             </h2>
             <div className="h-[3px] w-20 bg-[#D4AF37] mx-auto rounded-full" />
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">
-              Spearheading administration, financial strategy, and long-term planning for sustainable business growth.
+            <p className={`text-slate-500 text-sm sm:text-base leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+              {t(translations.director.subheading, lang)}
             </p>
           </div>
 
@@ -797,17 +880,17 @@ export default function LandingPage() {
               {/* Director Details */}
               <div className="flex-grow space-y-5 text-center lg:text-left">
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-[11px] font-black uppercase tracking-wider">
-                    Director
+                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-[11px] font-black uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                    {t(translations.director.directorBadge, lang)}
                   </span>
-                  <span className="inline-flex items-center gap-1 px-3.5 py-1 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-[11px] font-bold tracking-wider">
-                    Administration &amp; Finance
+                  <span className={`inline-flex items-center gap-1 px-3.5 py-1 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-[11px] font-bold tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                    {t(translations.director.directorDept, lang)}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-2xl sm:text-3.5xl font-extrabold text-[#0A4D8C] font-heading">Mrs. Anusha Dhamodharan</h3>
-                  <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mt-1">
-                    Administration, Finance &amp; Strategic Planning
+                  <h3 className={`text-2xl sm:text-3.5xl font-extrabold text-[#0A4D8C] font-heading ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.director.directorName, lang)}</h3>
+                  <p className={`text-xs text-slate-400 font-bold tracking-widest uppercase mt-1 ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                    {t(translations.director.directorSubtitle, lang)}
                   </p>
                 </div>
                 <div className="h-[2px] w-14 bg-[#D4AF37] mx-auto lg:mx-0 rounded-full" />
@@ -823,12 +906,12 @@ export default function LandingPage() {
                   </p>
                 </div>
 
-                <p className="text-sm sm:text-base text-[#1E293B] leading-relaxed font-medium italic">
-                  &quot;Careful planning, financial discipline, and strategic decision-making are essential for sustainable growth. At AVM Plastics, we focus on responsible management, operational excellence, and long-term value creation while preserving the trust our customers have placed in us since 1986.&quot;
+                <p className={`text-sm sm:text-base text-[#1E293B] leading-relaxed font-medium italic ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+                  {t(translations.director.directorQuote, lang)}
                 </p>
                 <div className="pt-2 text-right lg:text-left">
-                  <p className="text-sm font-bold text-[#0A4D8C]">— Mrs. Anusha Dhamodharan</p>
-                  <p className="text-xs text-slate-400 font-semibold">Director – Administration &amp; Finance</p>
+                  <p className={`text-sm font-bold text-[#0A4D8C] ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.director.directorSignName, lang)}</p>
+                  <p className={`text-xs text-slate-400 font-semibold ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.director.directorSignTitle, lang)}</p>
                 </div>
               </div>
             </div>
@@ -842,16 +925,16 @@ export default function LandingPage() {
           
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-xs font-bold uppercase tracking-wider">
+            <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-xs font-bold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
               <Package size={12} />
-              Wholesale Inventory
+              {t(translations.products.badge, lang)}
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading">
-              Premium Product Collections
+            <h2 className={`text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[36px] leading-[1.3]' : ''}`}>
+              {t(translations.products.heading, lang)}
             </h2>
             <div className="h-[3px] w-20 bg-[#D4AF37] mx-auto rounded-full" />
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">
-              We maintain massive stock categories for instant wholesale supply and heavy-duty utility applications.
+            <p className={`text-slate-500 text-sm sm:text-base leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+              {t(translations.products.subheading, lang)}
             </p>
           </div>
 
@@ -880,20 +963,20 @@ export default function LandingPage() {
                 {/* Content */}
                 <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37]">Premium Quality</span>
-                    <h3 className="text-lg font-bold text-[#0A4D8C] font-heading group-hover:text-[#D4AF37] transition-colors duration-300">
-                      {cat.title}
+                    <span className={`text-[10px] font-black uppercase tracking-widest text-[#D4AF37] ${lang === 'ta' ? 'font-tamil tracking-wider' : ''}`}>{t(translations.products.premiumQuality, lang)}</span>
+                    <h3 className={`text-lg font-bold text-[#0A4D8C] font-heading group-hover:text-[#D4AF37] transition-colors duration-300 ${lang === 'ta' ? 'font-tamil text-base' : ''}`}>
+                      {t(translations.categories[idx].title, lang)}
                     </h3>
-                    <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed font-medium">
-                      {cat.desc}
+                    <p className={`text-xs text-slate-500 line-clamp-3 leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                      {t(translations.categories[idx].desc, lang)}
                     </p>
                   </div>
 
                   <button
                     onClick={() => setActiveCategory(cat)}
-                    className="w-full inline-flex items-center justify-center gap-1.5 py-3 rounded-xl bg-[#0A4D8C]/5 hover:bg-[#0A4D8C] text-[#0A4D8C] hover:text-white font-bold text-xs transition-all duration-300 cursor-pointer border border-[#0A4D8C]/10"
+                    className={`w-full inline-flex items-center justify-center gap-1.5 py-3 rounded-xl bg-[#0A4D8C]/5 hover:bg-[#0A4D8C] text-[#0A4D8C] hover:text-white font-bold text-xs transition-all duration-300 cursor-pointer border border-[#0A4D8C]/10 ${lang === 'ta' ? 'font-tamil' : ''}`}
                   >
-                    Learn Details
+                    {t(translations.products.learnDetails, lang)}
                     <ArrowUpRight size={14} />
                   </button>
                 </div>
@@ -910,16 +993,16 @@ export default function LandingPage() {
           
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider">
+            <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
               <ShieldCheck size={12} />
-              Heritage & Trust Values
+              {t(translations.trust.badge, lang)}
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading">
-              Why Customers Rely On Us
+            <h2 className={`text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[36px] leading-[1.3]' : ''}`}>
+              {t(translations.trust.heading, lang)}
             </h2>
             <div className="h-[3px] w-20 bg-[#0A4D8C] mx-auto rounded-full" />
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">
-              Over 38 years, our operational discipline has defined our wholesale legacy.
+            <p className={`text-slate-500 text-sm sm:text-base leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+              {t(translations.trust.subheading, lang)}
             </p>
           </div>
 
@@ -945,14 +1028,14 @@ export default function LandingPage() {
                   className={`${gridSpan} p-8 rounded-[24px] border ${borderStyle} flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md`}
                 >
                   <div className="space-y-4">
-                    <span className="text-[10px] uppercase tracking-widest font-black text-slate-400 block">
-                      Value Core 0{idx + 1}
+                    <span className={`text-[10px] uppercase tracking-widest font-black text-slate-400 block ${lang === 'ta' ? 'font-tamil tracking-wider' : ''}`}>
+                      {t(translations.trust.valueCorePrefix, lang)} 0{idx + 1}
                     </span>
-                    <h3 className={`text-xl font-bold ${textAccent} font-heading`}>
-                      {reason.title}
+                    <h3 className={`text-xl font-bold ${textAccent} font-heading ${lang === 'ta' ? 'font-tamil text-lg' : ''}`}>
+                      {t(translations.trustReasons[idx].title, lang)}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
-                      {reason.desc}
+                    <p className={`text-xs sm:text-sm text-slate-500 leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+                      {t(translations.trustReasons[idx].desc, lang)}
                     </p>
                   </div>
                 </motionClient.div>
@@ -967,15 +1050,15 @@ export default function LandingPage() {
       <section className="py-24 bg-[#F8F9FB] border-t border-[#0A4D8C]/10 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-xs font-bold uppercase tracking-wider">
-              History
+            <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] text-xs font-bold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+              {t(translations.timeline.badge, lang)}
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading">
-              Our Journey Through Time
+            <h2 className={`text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[36px] leading-[1.3]' : ''}`}>
+              {t(translations.timeline.heading, lang)}
             </h2>
             <div className="h-[3px] w-20 bg-[#D4AF37] mx-auto rounded-full" />
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">
-              A timeline showing how we established commercial excellence in South India.
+            <p className={`text-slate-500 text-sm sm:text-base leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+              {t(translations.timeline.subheading, lang)}
             </p>
           </div>
 
@@ -984,13 +1067,7 @@ export default function LandingPage() {
             <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-[#0A4D8C]/5 via-[#D4AF37]/45 to-[#0A4D8C]/5 -translate-y-1/2 hidden lg:block" />
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 relative">
-              {[
-                { year: "1986", title: "Business Founded", desc: "Established by Mr. K. Arumugam with a focus on trust and absolute quality." },
-                { year: "1995", title: "Expanded Categories", desc: "Introduced wide range of household products and domestic utility items." },
-                { year: "2005", title: "Leading Rope Supplier", desc: "Secured key wholesale rope distributorships, including premium Nandi ropes." },
-                { year: "2015", title: "Modern Expansion", desc: "Upgraded logistics, expanded local showroom, and integrated automatic billing systems." },
-                { year: "2025", title: "Serving Thousands", desc: "Now trusted by over 10,000 retail and wholesale clients across Tamil Nadu." }
-              ].map((milestone, idx) => (
+              {translations.milestones.map((milestone, idx) => (
                 <motionClient.div
                   key={idx}
                   initial={{ opacity: 0, y: 20 }}
@@ -1004,8 +1081,8 @@ export default function LandingPage() {
                   </div>
 
                   <div className="p-6 rounded-[20px] bg-white border border-[#0A4D8C]/15 shadow-sm hover:shadow-md transition-all duration-300 w-full max-w-sm">
-                    <h4 className="text-sm sm:text-base font-bold text-[#0A4D8C] font-heading mb-2">{milestone.title}</h4>
-                    <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed font-medium">{milestone.desc}</p>
+                    <h4 className={`text-sm sm:text-base font-bold text-[#0A4D8C] font-heading mb-2 ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(milestone.title, lang)}</h4>
+                    <p className={`text-[11px] sm:text-xs text-slate-500 leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>{t(milestone.desc, lang)}</p>
                   </div>
                 </motionClient.div>
               ))}
@@ -1021,25 +1098,25 @@ export default function LandingPage() {
           
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider">
-              Showcase
+            <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+              {t(translations.gallery.badge, lang)}
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading">
-              Our Showroom & Legacy Gallery
+            <h2 className={`text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[36px] leading-[1.3]' : ''}`}>
+              {t(translations.gallery.heading, lang)}
             </h2>
             <div className="h-[3px] w-20 bg-[#0A4D8C] mx-auto rounded-full" />
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">
-              View the physical environment, extensive product inventory, and operational scale of our wholesale showrooms.
+            <p className={`text-slate-500 text-sm sm:text-base leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+              {t(translations.gallery.subheading, lang)}
             </p>
           </div>
 
           {/* Interactive Category Tabs */}
           <div className="flex flex-wrap justify-center gap-3 mb-10">
             {[
-              { id: 'all', label: 'All Showcase', icon: Layers },
-              { id: 'store', label: 'Our Showroom', icon: MapPin },
-              { id: 'product', label: 'Premium Products', icon: Package },
-              { id: 'warehouse', label: 'Warehouse & Logistics', icon: Clock }
+              { id: 'all', label: translations.gallery.filterAll, icon: Layers },
+              { id: 'store', label: translations.gallery.filterStore, icon: MapPin },
+              { id: 'product', label: translations.gallery.filterProduct, icon: Package },
+              { id: 'warehouse', label: translations.gallery.filterWarehouse, icon: Clock }
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = selectedGalleryCategory === tab.id;
@@ -1047,14 +1124,14 @@ export default function LandingPage() {
                 <button
                   key={tab.id}
                   onClick={() => setSelectedGalleryCategory(tab.id as any)}
-                  className={`inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold transition-all duration-300 border cursor-pointer ${
+                  className={`inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold transition-all duration-300 border cursor-pointer ${lang === 'ta' ? 'font-tamil' : ''} ${
                     isActive
                       ? 'bg-[#0A4D8C] border-[#D4AF37] text-white shadow-md'
                       : 'bg-slate-50 hover:bg-slate-100 text-[#1E293B] border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <TabIcon size={14} className={isActive ? 'text-[#D4AF37]' : 'text-slate-400'} />
-                  <span>{tab.label}</span>
+                  <span>{t(tab.label, lang)}</span>
                 </button>
               );
             })}
@@ -1083,15 +1160,15 @@ export default function LandingPage() {
                 
                 {/* Premium matte gradient overlay with aligned details */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <span className="self-start px-2 py-0.5 rounded bg-[#D4AF37] text-[#0A4D8C] text-[9px] font-black uppercase tracking-wider mb-1">
-                    {img.category === 'store' ? 'Showroom' : img.category === 'product' ? 'Product' : 'Warehouse'}
+                  <span className={`self-start px-2 py-0.5 rounded bg-[#D4AF37] text-[#0A4D8C] text-[9px] font-black uppercase tracking-wider mb-1 ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                    {img.category === 'store' ? t(translations.gallery.categoryShowroom, lang) : img.category === 'product' ? t(translations.gallery.categoryProduct, lang) : t(translations.gallery.categoryWarehouse, lang)}
                   </span>
                   <h4 className="text-white text-xs sm:text-sm font-bold font-heading line-clamp-2">
                     {img.alt}
                   </h4>
-                  <div className="mt-2 text-[#D4AF37] text-[10px] font-bold flex items-center gap-1">
+                  <div className={`mt-2 text-[#D4AF37] text-[10px] font-bold flex items-center gap-1 ${lang === 'ta' ? 'font-tamil' : ''}`}>
                     <Maximize2 size={10} />
-                    <span>Click to view</span>
+                    <span>{t(translations.gallery.clickToView, lang)}</span>
                   </div>
                 </div>
               </motionClient.div>
@@ -1106,17 +1183,17 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading">
-              Trusted By Thousands of Clients
+            <h2 className={`text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[36px] leading-[1.3]' : ''}`}>
+              {t(translations.testimonials.heading, lang)}
             </h2>
             <div className="h-[3px] w-20 bg-[#D4AF37] mx-auto rounded-full" />
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">
-              What farmers, retailers, and local partners say about our wholesale quality and pricing.
+            <p className={`text-slate-500 text-sm sm:text-base leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+              {t(translations.testimonials.subheading, lang)}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t, idx) => (
+            {TESTIMONIALS.map((tItem, idx) => (
               <motionClient.div
                 key={idx}
                 initial={{ opacity: 0, y: 15 }}
@@ -1127,12 +1204,12 @@ export default function LandingPage() {
               >
                 <div className="space-y-4">
                   <div className="flex items-center gap-1 text-[#D4AF37]">
-                    {[...Array(t.rating)].map((_, s) => (
+                    {[...Array(tItem.rating)].map((_, s) => (
                       <Star key={s} size={15} fill="currentColor" />
                     ))}
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium italic">
-                    "{t.quote}"
+                  <p className={`text-xs sm:text-sm text-slate-600 leading-relaxed font-medium italic ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+                    &quot;{t(translations.testimonialItems[idx].quote, lang)}&quot;
                   </p>
                 </div>
                 
@@ -1141,8 +1218,8 @@ export default function LandingPage() {
                     <User size={16} />
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-[#0A4D8C] font-heading">{t.name}</h4>
-                    <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">{t.role}</p>
+                    <h4 className="text-xs sm:text-sm font-bold text-[#0A4D8C] font-heading">{tItem.name}</h4>
+                    <p className={`text-[10px] text-slate-500 font-semibold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>{t(translations.testimonialItems[idx].role, lang)}</p>
                   </div>
                 </div>
               </motionClient.div>
@@ -1160,42 +1237,42 @@ export default function LandingPage() {
         <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
         
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 z-10 space-y-8">
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/45 text-[#D4AF37] text-xs font-bold uppercase tracking-widest">
+          <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/45 text-[#D4AF37] text-xs font-bold uppercase tracking-widest ${lang === 'ta' ? 'font-tamil tracking-wider' : ''}`}>
             <Sparkles size={12} fill="currentColor" />
-            DIRECT DISTRIBUTOR CONNECT
+            {t(translations.cta.badge, lang)}
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-[45px] font-extrabold tracking-tight text-white font-heading leading-tight">
-            Need Quality Products? Visit AVM Plastics Today
+          <h2 className={`text-3xl sm:text-4xl lg:text-[45px] font-extrabold tracking-tight text-white font-heading leading-tight ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl lg:text-[38px] leading-[1.3]' : ''}`}>
+            {t(translations.cta.heading, lang)}
           </h2>
-          <p className="text-slate-200 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed font-medium">
-            Contact Mr. Dhamodharan directly for current price sheets, wholesale distribution terms, and customized agricultural rope requirements.
+          <p className={`text-slate-200 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+            {t(translations.cta.subheading, lang)}
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
             <a 
               href="tel:+919443415251"
-              className="w-full sm:w-auto h-14 px-8 rounded-full bg-[#D4AF37] hover:bg-[#B5932C] hover:scale-[1.03] active:scale-[0.98] text-[#0A4D8C] font-bold text-sm shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer border border-[#0A4D8C]/10"
+              className={`w-full sm:w-auto h-14 px-8 rounded-full bg-[#D4AF37] hover:bg-[#B5932C] hover:scale-[1.03] active:scale-[0.98] text-[#0A4D8C] font-bold text-sm shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer border border-[#0A4D8C]/10 ${lang === 'ta' ? 'font-tamil' : ''}`}
             >
               <Phone size={16} />
-              Call Now: +91 94434 15251
+              {t(translations.cta.callNow, lang)}
             </a>
             <a 
               href="https://wa.me/919443415251?text=Hi AVM Plastics, I would like to inquire about your products."
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto h-14 px-8 rounded-full bg-[#10B981] hover:bg-[#10B981]/90 hover:scale-[1.03] active:scale-[0.98] text-white font-bold text-sm shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              className={`w-full sm:w-auto h-14 px-8 rounded-full bg-[#10B981] hover:bg-[#10B981]/90 hover:scale-[1.03] active:scale-[0.98] text-white font-bold text-sm shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${lang === 'ta' ? 'font-tamil' : ''}`}
             >
               <MessageSquare size={16} />
-              WhatsApp Inquiry
+              {t(translations.cta.whatsappInquiry, lang)}
             </a>
             <a 
               href="https://maps.google.com/?q=AVM+Plastics+Salem+Main+Road+Krishnagiri"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto h-14 px-8 rounded-full bg-white/10 hover:bg-white/20 hover:scale-[1.03] active:scale-[0.98] text-white border border-white/20 hover:border-[#D4AF37]/50 font-bold text-sm backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              className={`w-full sm:w-auto h-14 px-8 rounded-full bg-white/10 hover:bg-white/20 hover:scale-[1.03] active:scale-[0.98] text-white border border-white/20 hover:border-[#D4AF37]/50 font-bold text-sm backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${lang === 'ta' ? 'font-tamil' : ''}`}
             >
               <MapPin size={16} />
-              Get Directions
+              {t(translations.cta.getDirections, lang)}
             </a>
           </div>
         </div>
@@ -1210,14 +1287,14 @@ export default function LandingPage() {
             {/* Info Cards Panel (5 cols) */}
             <div className="lg:col-span-5 space-y-6 flex flex-col justify-between">
               <div className="space-y-6">
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider">
-                  Contact Center
+                <span className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0A4D8C]/10 text-[#0A4D8C] text-xs font-bold uppercase tracking-wider ${lang === 'ta' ? 'font-tamil tracking-normal' : ''}`}>
+                  {t(translations.contact.badge, lang)}
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1E293B] font-heading">
-                  Visit Our Wholesale Outlet
+                <h2 className={`text-3xl sm:text-4xl font-bold tracking-tight text-[#1E293B] font-heading ${lang === 'ta' ? 'font-tamil text-2xl sm:text-3xl leading-[1.3]' : ''}`}>
+                  {t(translations.contact.heading, lang)}
                 </h2>
-                <p className="text-slate-500 text-sm leading-relaxed font-medium">
-                  We are conveniently located on Salem Main Road in Krishnagiri. Our doors are open for both bulk commercial enquiries and retail supplies.
+                <p className={`text-slate-500 text-sm leading-relaxed font-medium ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+                  {t(translations.contact.subheading, lang)}
                 </p>
 
                 {/* Direct Address & Business Information Details */}
@@ -1226,11 +1303,11 @@ export default function LandingPage() {
                   <div className="p-5 bg-white border border-[#0A4D8C]/15 rounded-[20px] shadow-sm space-y-3">
                     <div className="flex items-start gap-3">
                       <MapPin className="text-[#D4AF37] shrink-0 mt-1" size={20} />
-                      <div className="text-xs sm:text-sm font-medium">
-                        <h4 className="font-bold text-[#0A4D8C] text-sm mb-1 font-heading">AVM Plastics</h4>
-                        <p className="text-slate-600">Krishnagiri Courts Complex</p>
-                        <p className="text-slate-600">Opposite New Saravana Textiles</p>
-                        <p className="text-slate-600">Krishnagiri, Tamil Nadu - 635001</p>
+                      <div className={`text-xs sm:text-sm font-medium ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                        <h4 className="font-bold text-[#0A4D8C] text-sm mb-1 font-heading">{t(translations.contact.addressTitle, lang)}</h4>
+                        <p className="text-slate-600">{t(translations.contact.addressLine1, lang)}</p>
+                        <p className="text-slate-600">{t(translations.contact.addressLine2, lang)}</p>
+                        <p className="text-slate-600">{t(translations.contact.addressLine3, lang)}</p>
                       </div>
                     </div>
                     
@@ -1238,21 +1315,16 @@ export default function LandingPage() {
                     
                     {/* Business Categories List as Badges */}
                     <div className="space-y-2">
-                      <span className="text-[10px] font-black tracking-widest text-[#D4AF37] uppercase block">
-                        Registered Business Domains
+                      <span className={`text-[10px] font-black tracking-widest text-[#D4AF37] uppercase block ${lang === 'ta' ? 'font-tamil tracking-wider' : ''}`}>
+                        {t(translations.contact.registeredDomains, lang)}
                       </span>
                       <div className="flex flex-wrap gap-2">
-                        {[
-                          "Plastic Material Distributor",
-                          "Agriculture Utility Products Supplier",
-                          "Wholesale Rope Supplier",
-                          "Plastic Utility Goods Distributor"
-                        ].map((domain, index) => (
+                        {translations.contact.domains.map((domain, index) => (
                           <span 
                             key={index} 
-                            className="inline-block px-2.5 py-1 bg-[#0A4D8C]/5 border border-[#0A4D8C]/10 text-[#0A4D8C] text-[10px] font-bold rounded-md"
+                            className={`inline-block px-2.5 py-1 bg-[#0A4D8C]/5 border border-[#0A4D8C]/10 text-[#0A4D8C] text-[10px] font-bold rounded-md ${lang === 'ta' ? 'font-tamil' : ''}`}
                           >
-                            {domain}
+                            {t(domain, lang)}
                           </span>
                         ))}
                       </div>
@@ -1263,21 +1335,21 @@ export default function LandingPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 bg-white border border-[#0A4D8C]/15 rounded-[20px] shadow-sm flex items-start gap-3">
                       <Clock className="text-[#0A4D8C] shrink-0 mt-0.5" size={18} />
-                      <div className="text-xs font-medium">
-                        <h4 className="font-bold text-[#0A4D8C] mb-1 font-heading">Business Hours</h4>
-                        <p className="text-slate-600">Mon - Sat</p>
-                        <p className="text-slate-600">9:30 AM - 8:30 PM</p>
-                        <p className="text-slate-400 text-[10px] italic">Closed Sundays</p>
+                      <div className={`text-xs font-medium ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                        <h4 className="font-bold text-[#0A4D8C] mb-1 font-heading">{t(translations.contact.businessHours, lang)}</h4>
+                        <p className="text-slate-600">{t(translations.contact.monSat, lang)}</p>
+                        <p className="text-slate-600">{t(translations.contact.hours, lang)}</p>
+                        <p className="text-slate-400 text-[10px] italic">{t(translations.contact.closedSundays, lang)}</p>
                       </div>
                     </div>
                     <div className="p-4 bg-white border border-[#0A4D8C]/15 rounded-[20px] shadow-sm flex items-start gap-3">
                       <Phone className="text-[#D4AF37] shrink-0 mt-0.5" size={18} />
-                      <div className="text-xs font-medium">
-                        <h4 className="font-bold text-[#0A4D8C] mb-1 font-heading">Direct Contact</h4>
+                      <div className={`text-xs font-medium ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                        <h4 className="font-bold text-[#0A4D8C] mb-1 font-heading">{t(translations.contact.directContact, lang)}</h4>
                         <p className="text-slate-600 font-bold">94434 15251</p>
-                        <p className="text-slate-500">Mr. Dhamodharan</p>
+                        <p className="text-slate-500">{t(translations.contact.contactPerson, lang)}</p>
                         <span className="inline-block mt-1 px-2 py-0.5 bg-[#D4AF37]/15 text-[#D4AF37] text-[9px] font-bold rounded">
-                          36+ Years in Business
+                          {t(translations.contact.yearsInBusiness, lang)}
                         </span>
                       </div>
                     </div>
@@ -1289,19 +1361,19 @@ export default function LandingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
                 <a 
                   href="tel:+919443415251"
-                  className="inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#0A4D8C] hover:bg-[#0A4D8C]/90 text-white font-bold text-sm shadow-md transition-colors"
+                  className={`inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#0A4D8C] hover:bg-[#0A4D8C]/90 text-white font-bold text-sm shadow-md transition-colors ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <Phone size={14} className="text-[#D4AF37]" />
-                  Call 94434 15251
+                  {t(translations.contact.callBtn, lang)}
                 </a>
                 <a 
                   href="https://wa.me/919443415251?text=Hi AVM Plastics, I would like to inquire about your products."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#10B981] hover:bg-[#10B981]/90 text-white font-bold text-sm shadow-md transition-colors"
+                  className={`inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-[#10B981] hover:bg-[#10B981]/90 text-white font-bold text-sm shadow-md transition-colors ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <MessageSquare size={14} />
-                  WhatsApp Query
+                  {t(translations.contact.whatsappBtn, lang)}
                 </a>
               </div>
             </div>
@@ -1319,17 +1391,17 @@ export default function LandingPage() {
               </div>
 
               <div className="p-5 bg-white border-t border-[#0A4D8C]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-xs font-medium text-slate-500">
-                  <h4 className="font-bold text-[#0A4D8C] text-sm">AVM PLASTICS</h4>
-                  <p>Salem Main Road, Krishnagiri Courts Area</p>
+                <div className={`text-xs font-medium text-slate-500 ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                  <h4 className="font-bold text-[#0A4D8C] text-sm">{t(translations.contact.mapTitle, lang)}</h4>
+                  <p>{t(translations.contact.mapSubtitle, lang)}</p>
                 </div>
                 <a 
                   href="https://maps.google.com/?q=AVM+Plastics+Salem+Main+Road+Krishnagiri"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#B5932C] text-[#F8F9FB] font-bold text-xs shadow-md transition-colors"
+                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#B5932C] text-[#F8F9FB] font-bold text-xs shadow-md transition-colors ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
-                  <span>Open in Google Maps</span>
+                  <span>{t(translations.contact.openInMaps, lang)}</span>
                   <ArrowUpRight size={14} />
                 </a>
               </div>
@@ -1344,29 +1416,29 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left border-b border-white/10 pb-8 mb-8">
             <div className="space-y-2">
-              <h3 className="text-white font-extrabold text-xl font-heading tracking-tight">AVM PLASTICS</h3>
-              <p className="text-xs text-slate-400 font-medium">Serving Homes, Farmers & Businesses for Generations Since 1986.</p>
+              <h3 className={`text-white font-extrabold text-xl font-heading tracking-tight ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.footer.companyName, lang)}</h3>
+              <p className={`text-xs text-slate-400 font-medium ${lang === 'ta' ? 'font-tamil' : ''}`}>{t(translations.footer.footerTagline, lang)}</p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-6 text-xs font-bold">
-              {['Home', 'About', 'Products', 'Leadership', 'Gallery', 'Contact'].map((item) => (
+            <div className={`flex flex-wrap justify-center gap-6 text-xs font-bold ${lang === 'ta' ? 'font-tamil' : ''}`}>
+              {navItems.map((item) => (
                 <button 
-                  key={item}
-                  onClick={() => scrollToSection(item.toLowerCase())} 
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)} 
                   className="hover:text-[#D4AF37] transition-colors cursor-pointer"
                 >
-                  {item}
+                  {t(item.label, lang)}
                 </button>
               ))}
               <Link href="/owner-login" className="hover:text-[#D4AF37] text-[#D4AF37] transition-colors cursor-pointer">
-                Owner Portal
+                {t(translations.footer.ownerPortal, lang)}
               </Link>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4 text-center">
-            <p>&copy; {new Date().getFullYear()} AVM Plastics. All Rights Reserved.</p>
-            <p className="text-[10px] text-slate-500">Opposite New Saravana Textiles, Near Krishnagiri Courts, Salem Main Road, Krishnagiri</p>
+          <div className={`flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4 text-center ${lang === 'ta' ? 'font-tamil' : ''}`}>
+            <p>&copy; {new Date().getFullYear()} {t(translations.footer.copyright, lang)}</p>
+            <p className="text-[10px] text-slate-500">{t(translations.footer.footerAddress, lang)}</p>
           </div>
 
           {/* Spiritual Divider & Text */}
@@ -1419,14 +1491,20 @@ export default function LandingPage() {
                 />
 
                 <div className="space-y-3">
-                  <span className="inline-block px-3 py-1 bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[#D4AF37] text-[10px] font-black uppercase rounded-full">
-                    Wholesale Profile
+                  <span className={`inline-block px-3 py-1 bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[#D4AF37] text-[10px] font-black uppercase rounded-full ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                    {t(translations.modal.wholesaleProfile, lang)}
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#0A4D8C] font-heading pt-1">
-                    {activeCategory.title}
+                  <h3 className={`text-xl sm:text-2xl font-extrabold text-[#0A4D8C] font-heading pt-1 ${lang === 'ta' ? 'font-tamil text-lg sm:text-xl' : ''}`}>
+                    {(() => {
+                      const catIdx = CATEGORIES.findIndex(c => c.id === activeCategory.id);
+                      return catIdx >= 0 ? t(translations.categories[catIdx].title, lang) : activeCategory.title;
+                    })()}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium pt-2">
-                    {activeCategory.details}
+                  <p className={`text-xs sm:text-sm text-slate-600 leading-relaxed font-medium pt-2 ${lang === 'ta' ? 'font-tamil leading-loose' : ''}`}>
+                    {(() => {
+                      const catIdx = CATEGORIES.findIndex(c => c.id === activeCategory.id);
+                      return catIdx >= 0 ? t(translations.categories[catIdx].details, lang) : activeCategory.details;
+                    })()}
                   </p>
                 </div>
               </div>
@@ -1434,18 +1512,18 @@ export default function LandingPage() {
               <div className="grid grid-cols-2 gap-3 mt-6 pt-5 border-t border-[#0A4D8C]/10">
                 <button 
                   onClick={() => setActiveCategory(null)}
-                  className="py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-[#1E293B] cursor-pointer"
+                  className={`py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-[#1E293B] cursor-pointer ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
-                  Close Window
+                  {t(translations.modal.closeWindow, lang)}
                 </button>
                 <a 
                   href={`https://wa.me/919443415251?text=${encodeURIComponent(activeCategory.waMessage)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3 rounded-xl bg-[#10B981] hover:bg-[#10B981]/90 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-1.5"
+                  className={`py-3 rounded-xl bg-[#10B981] hover:bg-[#10B981]/90 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-1.5 ${lang === 'ta' ? 'font-tamil' : ''}`}
                 >
                   <MessageSquare size={14} />
-                  WhatsApp Inquiry
+                  {t(translations.modal.whatsappInquiry, lang)}
                 </a>
               </div>
             </motionClient.div>
@@ -1481,7 +1559,7 @@ export default function LandingPage() {
             >
               <img 
                 src={activeLightboxImage} 
-                alt="Expanded Showcase View"
+                alt={t(translations.modal.expandedView, lang)}
                 className="max-w-full max-h-[85vh] rounded-2xl object-contain border border-white/10"
               />
             </motionClient.div>
