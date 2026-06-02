@@ -400,6 +400,17 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   hyphens: auto;
 }
 
+/* Override for elements that must never wrap or break */
+.lang-ta .whitespace-nowrap,
+.lang-ta nav button,
+.lang-ta button.whitespace-nowrap,
+.lang-ta [class*="whitespace-nowrap"] {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  hyphens: none !important;
+}
+
 /* Tamil heading line height adjustments */
 .lang-ta .font-heading {
   line-height: 1.35;

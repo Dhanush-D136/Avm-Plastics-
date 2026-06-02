@@ -103,13 +103,13 @@ export const translations = {
     },
     founderBadge: { en: "Founder", ta: "நிறுவனர்" },
     founderTitle: { en: "Former TNCSC Superintendent", ta: "முன்னாள் TNCSC கண்காணிப்பாளர்" },
-    founderName: { en: "Mr. K. Arumugam", ta: "திரு. கே. அருமுகம்" },
+    founderName: { en: "Mr. K. Arumugam", ta: "திரு. கே. ஆறுமுகம்" },
     founderSubtitle: { en: "Founder of AVM Plastics (1986)", ta: "ஏவிஎம் பிளாஸ்டிக்ஸ் நிறுவனர் (1986)" },
     founderQuote: {
       en: "\"Since 1986, AVM Plastics has been built on trust, discipline, and integrity. Every customer relationship is founded on honesty, fair pricing, and unwavering commitment. The trust of our customers is our greatest achievement and the legacy we proudly continue.\"",
       ta: "\"1986 முதல், ஏவிஎம் பிளாஸ்டிக்ஸ் நம்பிக்கை, ஒழுக்கம் மற்றும் நேர்மையின் அடிப்படையில் கட்டமைக்கப்பட்டுள்ளது. ஒவ்வொரு வாடிக்கையாளர் உறவும் நேர்மை, நியாயமான விலை மற்றும் உறுதியான அர்ப்பணிப்பின் அடிப்படையில் அமைந்துள்ளது. எங்கள் வாடிக்கையாளர்களின் நம்பிக்கையே எங்கள் மிகப்பெரிய சாதனையும், நாங்கள் பெருமையுடன் தொடர்கின்ற மரபும் ஆகும்.\""
     },
-    founderSignName: { en: "— K. Arumugam", ta: "— கே. அருமுகம்" },
+    founderSignName: { en: "— K. Arumugam", ta: "— கே. ஆறுமுகம்" },
     founderSignTitle: { en: "Founder", ta: "நிறுவனர்" }
   },
 
@@ -337,7 +337,7 @@ export const translations = {
       title: { en: "Business Founded", ta: "வணிகம் நிறுவப்பட்டது" },
       desc: {
         en: "Established by Mr. K. Arumugam with a focus on trust and absolute quality.",
-        ta: "நம்பிக்கை மற்றும் முழுமையான தரத்தில் கவனம் செலுத்தி திரு. கே. அருமுகம் அவர்களால் நிறுவப்பட்டது."
+        ta: "நம்பிக்கை மற்றும் முழுமையான தரத்தில் கவனம் செலுத்தி திரு. கே. ஆறுமுகம் அவர்களால் நிறுவப்பட்டது."
       }
     },
     {

@@ -294,12 +294,12 @@ export default function LandingPage() {
           </div>
 
           {/* Navigation Links (Center) */}
-          <nav className="hidden md:flex items-center gap-7 text-[15px] font-bold text-[#1E293B]">
+          <nav className="hidden md:flex items-center flex-nowrap gap-4 lg:gap-7 text-[14px] lg:text-[15px] font-bold text-[#1E293B]">
             {navItems.map((item) => (
               <button 
                 key={item.id}
                 onClick={() => scrollToSection(item.id)} 
-                className={`hover:text-[#0A4D8C] relative py-1 transition-colors duration-300 cursor-pointer group ${lang === 'ta' ? 'font-tamil' : ''}`}
+                className={`hover:text-[#0A4D8C] relative py-1 transition-colors duration-300 cursor-pointer group whitespace-nowrap ${lang === 'ta' ? 'font-tamil' : ''}`}
               >
                 {t(item.label, lang)}
                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#D4AF37] transition-all duration-300 group-hover:w-full" />
@@ -405,7 +405,7 @@ export default function LandingPage() {
                   <button 
                     key={item.id}
                     onClick={() => scrollToSection(item.id)} 
-                    className="text-left py-1.5 hover:text-[#0A4D8C] transition-colors cursor-pointer"
+                    className="text-left py-1.5 hover:text-[#0A4D8C] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     {t(item.label, lang)}
                   </button>
