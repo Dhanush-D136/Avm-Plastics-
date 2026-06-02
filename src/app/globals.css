@@ -393,8 +393,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   letter-spacing: 0.01em;
 }
 
-/* Ensure Tamil text never overflows */
-.lang-ta * {
+/* Ensure Tamil text never overflows, but exclude buttons, links, and nowrap elements */
+.lang-ta *:not(.whitespace-nowrap):not(button):not(a):not(span) {
   word-break: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
@@ -403,7 +403,9 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 /* Override for elements that must never wrap or break */
 .lang-ta .whitespace-nowrap,
 .lang-ta nav button,
-.lang-ta button.whitespace-nowrap,
+.lang-ta button,
+.lang-ta a,
+.lang-ta span.whitespace-nowrap,
 .lang-ta [class*="whitespace-nowrap"] {
   white-space: nowrap !important;
   word-break: keep-all !important;

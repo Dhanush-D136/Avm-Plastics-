@@ -284,7 +284,7 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between">
           {/* Logo & Legacy (Left Side) */}
-          <div className="flex flex-col cursor-pointer group" onClick={() => scrollToSection('home')}>
+          <div className="flex flex-col cursor-pointer group shrink-0" onClick={() => scrollToSection('home')}>
             <span className={`text-xl sm:text-2xl font-extrabold tracking-tight text-[#0A4D8C] font-heading flex items-center gap-1.5 transition-colors duration-300 ${lang === 'ta' ? 'font-tamil' : ''}`}>
               {t(translations.companyName, lang)}
             </span>
@@ -294,12 +294,13 @@ export default function LandingPage() {
           </div>
 
           {/* Navigation Links (Center) */}
-          <nav className="hidden md:flex items-center flex-nowrap gap-4 lg:gap-7 text-[14px] lg:text-[15px] font-bold text-[#1E293B]">
+          <nav className="hidden md:flex items-center flex-nowrap gap-2.5 lg:gap-5 xl:gap-7 text-[12px] lg:text-[14px] xl:text-[15px] font-bold text-[#1E293B] shrink-0">
             {navItems.map((item) => (
               <button 
                 key={item.id}
                 onClick={() => scrollToSection(item.id)} 
-                className={`hover:text-[#0A4D8C] relative py-1 transition-colors duration-300 cursor-pointer group whitespace-nowrap ${lang === 'ta' ? 'font-tamil' : ''}`}
+                className={`hover:text-[#0A4D8C] relative py-1 transition-colors duration-300 cursor-pointer group whitespace-nowrap shrink-0 ${lang === 'ta' ? 'font-tamil' : ''}`}
+                style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
               >
                 {t(item.label, lang)}
                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#D4AF37] transition-all duration-300 group-hover:w-full" />
@@ -308,27 +309,29 @@ export default function LandingPage() {
           </nav>
 
           {/* Language Switcher + Call Now Button & Owner Icon (Right Side) */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-1.5 lg:gap-3 shrink-0">
             {/* Language Switcher */}
-            <div className="flex items-center bg-[#0A4D8C]/5 border border-[#0A4D8C]/10 rounded-full p-[3px] relative">
+            <div className="flex items-center bg-[#0A4D8C]/5 border border-[#0A4D8C]/10 rounded-full p-[1px] lg:p-[3px] relative shrink-0">
               <button
                 onClick={() => switchLanguage('en')}
-                className={`relative z-10 px-3.5 py-1.5 rounded-full text-[12px] font-bold transition-all duration-300 cursor-pointer flex items-center gap-1.5 ${
+                className={`relative z-10 px-2 lg:px-3.5 py-1 lg:py-1.5 rounded-full text-[11px] lg:text-[12px] font-bold transition-all duration-300 cursor-pointer flex items-center gap-1 lg:gap-1.5 whitespace-nowrap shrink-0 ${
                   lang === 'en'
                     ? 'bg-[#0A4D8C] text-white shadow-md'
                     : 'text-[#1E293B] hover:text-[#0A4D8C]'
                 }`}
+                style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
               >
                 <span className="text-[14px]">🇬🇧</span>
                 <span>EN</span>
               </button>
               <button
                 onClick={() => switchLanguage('ta')}
-                className={`relative z-10 px-3.5 py-1.5 rounded-full text-[12px] font-bold transition-all duration-300 cursor-pointer flex items-center gap-1.5 ${
+                className={`relative z-10 px-2 lg:px-3.5 py-1 lg:py-1.5 rounded-full text-[11px] lg:text-[12px] font-bold transition-all duration-300 cursor-pointer flex items-center gap-1 lg:gap-1.5 whitespace-nowrap shrink-0 ${
                   lang === 'ta'
                     ? 'bg-[#0A4D8C] text-white shadow-md'
                     : 'text-[#1E293B] hover:text-[#0A4D8C]'
                 }`}
+                style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
               >
                 <span className="text-[14px]">🇮🇳</span>
                 <span className="font-tamil">தமிழ்</span>
@@ -337,14 +340,15 @@ export default function LandingPage() {
 
             <a 
               href="tel:+919443415251"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0A4D8C] text-[#F8F9FB] hover:bg-[#0A4D8C]/90 hover:scale-[1.03] active:scale-[0.98] font-bold text-[14px] transition-all duration-300 shadow-[0_4px_14px_rgba(10,77,140,0.15)] hover:shadow-[0_6px_20px_rgba(212,175,55,0.25)] border border-[#D4AF37]/35 cursor-pointer"
+              className="inline-flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-full bg-[#0A4D8C] text-[#F8F9FB] hover:bg-[#0A4D8C]/90 hover:scale-[1.03] active:scale-[0.98] font-bold text-[12px] lg:text-[14px] transition-all duration-300 shadow-[0_4px_14px_rgba(10,77,140,0.15)] hover:shadow-[0_6px_20px_rgba(212,175,55,0.25)] border border-[#D4AF37]/35 cursor-pointer whitespace-nowrap shrink-0"
+              style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
             >
               <Phone size={14} className="text-[#D4AF37] animate-pulse" />
               <span>+91 94434 15251</span>
             </a>
             <Link 
               href="/owner-login" 
-              className="p-2.5 rounded-full bg-[#0A4D8C]/5 hover:bg-[#0A4D8C]/10 text-[#0A4D8C] border border-[#0A4D8C]/10 hover:border-[#D4AF37]/30 transition-all duration-300"
+              className="p-2.5 rounded-full bg-[#0A4D8C]/5 hover:bg-[#0A4D8C]/10 text-[#0A4D8C] border border-[#0A4D8C]/10 hover:border-[#D4AF37]/30 transition-all duration-300 shrink-0"
               title={t(translations.footer.ownerPortal, lang)}
             >
               <Lock size={14} />
